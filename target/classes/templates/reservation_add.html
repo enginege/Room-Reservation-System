@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="_layout"
+>
+  <div layout:fragment="header">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.2/main.min.css"
+    />
+    <link href="/css/calendar_room.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+      crossorigin="anonymous"
+    />
+    <link href="/css/sidebars.css" rel="stylesheet" />
+    <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>-->
+    <!--  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>-->
+  </div>
+
+  <body>
+    <div layout:fragment="content">
+      <h1 class="page-header">[[#{bar.new.reservation}]]</h1>
+      <!--Content of the page-->
+      <div class="container" style="max-width: 85vw">
+        <form
+          th:action="@{/reservation/new/add/{room_id} (room_id=${room_id}) }"
+          th:object="${ReservationDto}"
+          method="post"
+          class="form-horizontal"
+        >
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_NullDate}"
+            th:if="${error_NullDate}"
+          ></div>
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_CurrentDate}"
+            th:if="${error_CurrentDate}"
+          ></div>
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_Date}"
+            th:if="${error_Date}"
+          ></div>
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_EqualDate}"
+            th:if="${error_EqualDate}"
+          ></div>
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_Conflict}"
+            th:if="${error_Conflict}"
+          ></div>
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_maxCharNote}"
+            th:if="${error_maxCharNote}"
+          ></div>
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_NullSubject}"
+            th:if="${error_NullSubject}"
+          ></div>
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_ExceededEquipment}"
+            th:if="${error_ExceededEquipment}"
+          ></div>
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_ExceededCapacity}"
+            th:if="${error_ExceededCapacity}"
+          ></div>
+          <div
+            class="alert alert-danger"
+            align="center"
+            role="alert"
+            th:text="${error_ExceededTime}"
+            th:if="${error_ExceededTime}"
+          ></div>
+
+          <div class="row justify-content-between">
+            <div class="col-4">
+              <div style="margin-top: 1vh; max-height: 50vh">
+                <div class="form-group">
+                  <label class="col-sm-2 control-label"
+                    >[[#{reservation.subject}]]</label
+                  >
+                  <div class="col-sm-10">
+                    <select
+                      class="form-control"
+                      th:required="required"
+                      th:field="*{name}"
+                    >
+                      <option value="">[[#{reservation.select}]]</option>
+                      <option
+                        th:each="CategoryName : ${CategoryNames}"
+                        th:value="${CategoryName}"
+                        th:text="${CategoryName}"
+                      ></option>
+                    </select>
+
+                    <!--p class="text-red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p-->
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col" style="flex: 0.45 0 0%; padding-right: 0">
+                      <label
+                        style="color: #ff3333; font-weight: bold"
+                        for="start_datetime"
+                        >[[#{reservation.start.time}]]</label
+                      >
+                      <div class="col-sm-10">
+                        <input
+                          type="datetime-local"
+                          step="0"
+                          class="form-control"
+                          id="start_datetime"
+                          th:required="required"
+                          th:field="*{start}"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="col" style="flex: 0.45 0 0%">
+                      <label
+                        style="color: #ff3333; font-weight: bold"
+                        for="end_datetime"
+                        >[[#{reservation.end.time}]]</label
+                      >
+                      <div class="col-sm-10">
+                        <input
+                          type="datetime-local"
+                          step="0"
+                          class="form-control"
+                          id="end_datetime"
+                          th:required="required"
+                          th:field="*{end}"
+                        />
+                        <!--p class="text-red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p-->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label"
+                    >[[#{reservation.notes}]]:</label
+                  >
+                  <div class="col-sm-10">
+                    <textarea
+                      class="form-control"
+                      cols="50"
+                      maxlength="100"
+                      style="height: 6vh; max-height: 9vh"
+                      th:field="*{notes}"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <input
+                    style="margin-right: 0.5rem"
+                    type="checkbox"
+                    name="checked"
+                    th:text="Urgency"
+                    th:field="*{urgency}"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label"
+                    >[[#{reservation.equipments}]]:</label
+                  >
+                  <div class="col-sm-10">
+                    <span
+                      style="margin-right: 0.5rem"
+                      th:each="EquipmentName : ${EquipmentNames}"
+                    >
+                      <input
+                        style="margin-right: 0.5rem"
+                        type="checkbox"
+                        th:text="${EquipmentName}"
+                        th:value="${EquipmentName}"
+                        th:field="*{equipmentNames}"
+                      />
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label"
+                    >[[#{reservation.services}]]:</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      style="margin-right: 0.5rem"
+                      type="checkbox"
+                      th:text="Cleaning"
+                      th:field="*{cleaningService}"
+                    />
+                    <input
+                      style="margin-right: 0.5rem; margin-left: 0.5rem"
+                      type="checkbox"
+                      th:text="Food"
+                      th:field="*{foodService}"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1vw">
+                  <div style="display: flex; justify-content: space-between">
+                    <label class="col-sm-2 control-label"
+                      >[[#{reservation.participants}]]:</label
+                    >
+                    <div style="display: flex; gap: 0.5vw">
+                      <input
+                        type="text"
+                        id="searchInput"
+                        onkeyup="searchTable()"
+                        placeholder="Filter by Name"
+                        title="Type in a name"
+                      />
+                      <select
+                        id="search-filter"
+                        class="form-control btn btn-secondary"
+                        th:required="required"
+                      >
+                        <option value="0">[[#{users.name}]]</option>
+                        <option value="1">[[#{users.surname}]]</option>
+                        <option value="2">[[#{users.username}]]</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div
+                    align="center"
+                    style="overflow-y: scroll; max-height: 30vh"
+                  >
+                    <table
+                      id="Table"
+                      class="table table-responsive table-bordered table-striped"
+                    >
+                      <thead>
+                        <tr align="center">
+                          <th class="content-th order" onclick="sortTable(0)">
+                            [[#{users.name}]]
+                          </th>
+                          <th class="content-th order" onclick="sortTable(1)">
+                            [[#{users.surname}]]
+                          </th>
+                          <th class="content-th order" onclick="sortTable(2)">
+                            [[#{users.username}]]
+                          </th>
+                          <th class="content-th">
+                            [[#{reservation.add.participant}]]
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr th:each="user : ${users}" align="center">
+                          <td th:text="${user.firstName}"></td>
+                          <td th:text="${user.lastName}"></td>
+                          <td th:text="${user.userName}"></td>
+                          <td>
+                            <input
+                              type="checkbox"
+                              th:value="${user.userName}"
+                              th:field="*{userNames}"
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div align="center" style="margin-top: 2vh">
+                  <a th:href="@{/reservation/rooms}">
+                    <button type="button" class="btn btn-danger">
+                      [[#{reservation.cancel}]]
+                    </button>
+                  </a>
+                  <button type="submit" class="btn btn-info">
+                    [[#{reservation.save}]]
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-8">
+              <div style="margin-top: 3vh" id="calendar"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div layout:fragment="script">
+      <script src="/js/datetime.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.2/main.min.js"></script>
+      <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+      <script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
+      <script src="/js/calendar_room.js"></script>
+      <script src="/js/sort_search_table.js"></script>
+    </div>
+  </body>
+</html>

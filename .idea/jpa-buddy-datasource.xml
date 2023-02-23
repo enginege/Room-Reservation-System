@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JpbDataSourceConfig">
+    <data-sources>
+      <data-source id="aaf284c8-9f57-4ed9-aa72-f7cf4ebb98cf" name="RoomReservationSystem" url="jdbc:postgresql://localhost/postgres" driverClass="org.postgresql.Driver" />
+    </data-sources>
+  </component>
+</project>

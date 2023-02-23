@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  layout:decorate="_layout"
+>
+  <div layout:fragment="header">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.2/main.min.css"
+    />
+    <link href="/css/calendar.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+      crossorigin="anonymous"
+    />
+    <link href="/css/sidebars.css" rel="stylesheet" />
+  </div>
+
+  <body>
+    <div layout:fragment="content">
+      <!--Content of the page-->
+
+      <h1 class="page-header">[[#{user.edit.title}]]</h1>
+
+      <div
+        class="alert alert-success"
+        align="center"
+        role="alert"
+        th:text="${success}"
+        th:if="${success}"
+      ></div>
+      <div
+        class="alert alert-danger"
+        align="center"
+        role="alert"
+        th:text="${error_Username}"
+        th:if="${error_Username}"
+      ></div>
+      <div
+        class="alert alert-danger"
+        align="center"
+        role="alert"
+        th:text="${error_Name}"
+        th:if="${error_Name}"
+      ></div>
+      <div
+        class="alert alert-danger"
+        align="center"
+        role="alert"
+        th:text="${error_Surname}"
+        th:if="${error_Surname}"
+      ></div>
+      <div
+        class="alert alert-danger"
+        align="center"
+        role="alert"
+        th:text="${error_Email}"
+        th:if="${error_Email}"
+      ></div>
+      <div
+        class="alert alert-danger"
+        align="center"
+        role="alert"
+        th:text="${error_Department}"
+        th:if="${error_Department}"
+      ></div>
+      <div
+        class="alert alert-danger"
+        align="center"
+        role="alert"
+        th:text="${error_UsedBoth}"
+        th:if="${error_UsedBoth}"
+      ></div>
+      <div
+        class="alert alert-danger"
+        align="center"
+        role="alert"
+        th:text="${error_UsedUserName}"
+        th:if="${error_UsedUserName}"
+      ></div>
+      <div
+        class="alert alert-danger"
+        align="center"
+        role="alert"
+        th:text="${error_UsedEmail}"
+        th:if="${error_UsedEmail}"
+      ></div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <div
+              class="box-header with-border"
+              align="center"
+              style="margin-top: 1vh; width: 80%"
+            >
+              <h1 class="box-title">[[#{user.edit.details}]]</h1>
+            </div>
+            <div style="width: 80%; margin-top: 1rem">
+              <div class="row">
+                <div class="col-md-12">
+                  <!-- Horizontal Form -->
+                  <div class="box box-info">
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form
+                      th:action="@{/user/save/{user_id} (user_id=${user.id})}"
+                      th:object="${user}"
+                      method="post"
+                      class="form-horizontal"
+                    >
+                      <div class="box-body">
+                        <!--                <div class="form-group">-->
+                        <!--                  <label class="col-sm-2 control-label">ID</label>-->
+                        <!--                  <div class="col-sm-10">-->
+                        <!--                    <input type="text" class="form-control" readonly="readonly" th:field="*{id}" placeholder="ID" style="background-color: #c7c7c7;">-->
+                        <!--                    &lt;!&ndash;input class="form-control" type="text" th:field="*{id}" th:value="*{id}" aria-label="ID" disabled readonly&ndash;&gt;-->
+                        <!--                  </div>-->
+                        <!--                </div>-->
+
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label"
+                            >[[#{user.edit.username}]]</label
+                          >
+                          <div class="col-sm-10">
+                            <input
+                              readonly
+                              type="text"
+                              th:required="required"
+                              class="form-control"
+                              th:field="*{username}"
+                              style="background-color: #bbbbbb"
+                            />
+                            <!--p class="text-red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p-->
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label"
+                            >[[#{user.edit.name}]]</label
+                          >
+                          <div class="col-sm-10">
+                            <input
+                              type="text"
+                              th:required="required"
+                              class="form-control"
+                              th:field="*{name}"
+                            />
+                            <!--p class="text-red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p-->
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label"
+                            >[[#{user.edit.Surname}]]</label
+                          >
+                          <div class="col-sm-10">
+                            <input
+                              type="text"
+                              th:required="required"
+                              class="form-control"
+                              th:field="*{surname}"
+                            />
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label">Email</label>
+                          <div class="col-sm-10">
+                            <input
+                              type="email"
+                              th:required="required"
+                              class="form-control"
+                              th:field="*{email}"
+                            />
+                          </div>
+                        </div>
+
+                        <!--div class="form-group">
+                          <label class="col-sm-2 control-label">Department</label>
+                          <div class="col-sm-10">
+                            <input type="text" class="form-control" th:field="*{department.name}" />
+                            <p class="text-red" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+                          </div>
+                        </div-->
+                        <div class="form-group">
+                          <label class="col-sm-2 control-label"
+                            >[[#{user.edit.department}]]<span>*</span></label
+                          >
+                          <div class="col-sm-10">
+                            <select
+                              class="form-control"
+                              th:required="required"
+                              th:field="*{department}"
+                            >
+                              <option value="">
+                                [[#{user.edit.department.select}]]
+                              </option>
+                              <option
+                                th:each="departmentName : ${departmentNames}"
+                                th:value="${departmentName.id}"
+                                th:utext="${departmentName.name}"
+                              ></option>
+                            </select>
+
+                            <!--p class="text-red" th:if="${#fields.hasErrors('productTypeId')}" th:errors="*{productTypeId}"></p-->
+                          </div>
+                        </div>
+
+                        <!--div class="form-check form-check-inline" th:field="*{roles}" th:each="roleType: ${roleTypes}">
+                          <input class="form-check-input" type="checkbox" value="" th:value="${roleType.id}" th:utext="${roleType.name}" th:if="(${roleType.name} == ${})" id="flexCheckDefault">
+                          <label class="form-check-label" for="flexCheckDefault">
+                          </label>
+                        </div-->
+
+                        <!--id="flexCheckChecked"-->
+                      </div>
+                      <!-- /.box-body -->
+                      <div
+                        class="box-footer center"
+                        style="margin-top: 1rem"
+                        sec:authorize="hasAnyAuthority('CREATE', 'DELETE')"
+                      >
+                        <a th:href="@{/user/list}" style="margin-right: 5px">
+                          <button type="button" class="btn btn-danger">
+                            <i class="fa fa-right"></i>[[#{user.edit.cancel}]]
+                          </button>
+                        </a>
+                        <button type="submit" class="btn btn-info">
+                          <i class="fa fa-save"></i>[[#{user.edit.save}]]
+                        </button>
+                      </div>
+                      <!-- /.box-footer -->
+                    </form>
+                  </div>
+                </div>
+                <!-- /.box -->
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div
+              class="box-header with-border"
+              align="center"
+              style="margin-top: 1vh; width: 80%"
+            >
+              <h1 class="box-title">[[#{user.role.title1}]]</h1>
+            </div>
+            <div style="width: 80%; margin-top: 1rem">
+              <div class="container">
+                <div class="row">
+                  <div class="col">
+                    <h3 align="center" style="color: #224f41">
+                      [[#{user.role.assigned}]]
+                    </h3>
+                    <table
+                      class="table table-success table-responsive table-bordered table-striped"
+                    >
+                      <thead>
+                        <tr class="table table-success" align="center">
+                          <th>[[#{user.role}]]</th>
+                          <th>[[#{user.description}]]</th>
+                          <div
+                            sec:authorize="hasAnyAuthority('CREATE', 'DELETE')"
+                          >
+                            <th>[[#{user.action}]]</th>
+                          </div>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr th:each="userRole : ${userRoles}" align="center">
+                          <td th:text="${userRole.name}"></td>
+                          <td th:text="${userRole.description}"></td>
+                          <div
+                            sec:authorize="hasAnyAuthority('CREATE', 'DELETE')"
+                          >
+                            <td>
+                              <form
+                                th:action="@{/user/unassign/{role_id}/{user_id} (role_id=${userRole.id}, user_id=${user.id})}"
+                                method="POST"
+                              >
+                                <button
+                                  type="submit"
+                                  class="btn btn-danger btn-xs purple editView"
+                                >
+                                  [[#{user.role.unassign}]]
+                                </button>
+                              </form>
+                            </td>
+                          </div>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="col">
+                    <h3 align="center" style="color: #5e1800">
+                      [[#{user.role.title2}]]
+                    </h3>
+                    <table
+                      class="table table-danger table-responsive table-bordered table-striped"
+                      style="margin-top: 1rem"
+                    >
+                      <thead align="center">
+                        <tr class="table table-danger">
+                          <th>[[#{user.role}]]</th>
+                          <th>[[#{user.description}]]</th>
+                          <div
+                            sec:authorize="hasAnyAuthority('CREATE', 'DELETE')"
+                          >
+                            <th>[[#{user.action}]]</th>
+                          </div>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          th:each="userNotRole : ${userNotRoles}"
+                          align="center"
+                        >
+                          <td th:text="${userNotRole.name}"></td>
+                          <td th:text="${userNotRole.description}"></td>
+                          <div
+                            sec:authorize="hasAnyAuthority('CREATE', 'DELETE')"
+                          >
+                            <td>
+                              <form
+                                th:action="@{/user/assign/{role_id}/{user_id} (role_id=${userNotRole.id}, user_id=${user.id})}"
+                                method="POST"
+                              >
+                                <button
+                                  type="submit"
+                                  class="btn btn-success btn-xs purple editView"
+                                >
+                                  [[#{user.role.assign}]]
+                                </button>
+                              </form>
+                            </td>
+                          </div>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

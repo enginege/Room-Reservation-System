@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="_layout"
+>
+  <div layout:fragment="header">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.2/main.min.css"
+    />
+    <link href="/css/calendar.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+      crossorigin="anonymous"
+    />
+    <link href="/css/sidebars.css" rel="stylesheet" />
+  </div>
+
+  <body>
+    <div layout:fragment="content">
+      <h1 class="page-header">[[#{department.add.title}]]</h1>
+      <!--Content of the page-->
+      <div class="row">
+        <div class="col-md-12">
+          <!-- Horizontal Form -->
+          <div class="box box-info">
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form
+              th:action="@{/department/new/add}"
+              th:object="${DepartmentDto}"
+              method="post"
+              class="form-horizontal"
+            >
+              <div class="box-body">
+                <div class="form-group">
+                  <label class="col-sm-2 control-label"
+                    >[[#{department.add.name}]]</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:required="required"
+                      th:field="*{departmentName}"
+                    />
+                    <!--p class="text-red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p-->
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-sm-2 control-label"
+                    >[[#{department.add.company}]]<span>*</span></label
+                  >
+                  <div class="col-sm-10">
+                    <select
+                      class="form-control"
+                      th:required="required"
+                      th:field="*{companyName}"
+                    >
+                      <option value="">
+                        [[#{department.add.company.select}]]
+                      </option>
+                      <option
+                        th:each="CompanyName : ${CompanyNames}"
+                        th:value="${CompanyName}"
+                        th:text="${CompanyName}"
+                      ></option>
+                    </select>
+
+                    <!--p class="text-red" th:if="${#fields.hasErrors('productTypeId')}" th:errors="*{productTypeId}"></p-->
+                  </div>
+                </div>
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer center" style="margin-top: 1rem">
+                <a th:href="@{/department/list}" style="margin-right: 5px">
+                  <button type="button" class="btn btn-danger">
+                    <i class="fa fa-right"></i>[[#{department.add.cancel}]]
+                  </button>
+                </a>
+                <button type="submit" class="btn btn-info">
+                  <i class="fa fa-save"></i>[[#{department.add.save}]]
+                </button>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+          </div>
+        </div>
+        <!-- /.box -->
+      </div>
+    </div>
+  </body>
+</html>

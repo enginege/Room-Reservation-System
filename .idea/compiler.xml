@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="ASTRON-Reserve2" />
+        <module name="ASTRON-Reserve" />
+        <module name="ASTRON-Reserve3" />
+        <module name="Yasar-Reserve" />
+        <module name="RoomReservationSystem" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ASTRON-Reserve" options="-parameters" />
+      <module name="ASTRON-Reserve2" options="-parameters" />
+      <module name="ASTRON-Reserve3" options="-parameters" />
+      <module name="RoomReservationSystem" options="-parameters" />
+      <module name="Yasar-Reserve" options="-parameters" />
+    </option>
+  </component>
+</project>

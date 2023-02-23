@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="_layout">
+
+<div layout:fragment="header">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.2/main.min.css">
+    <link href="/css/calendar.css" rel="stylesheet" >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <link href="/css/sidebars.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</div>
+
+<body>
+<div layout:fragment="content">
+
+    <!--Content of the page-->
+
+    <h1 class="page-header">[[#{bar.pending.reservations}]]</h1>
+
+    <div style="display: flex; justify-content: space-between">
+        <div></div>
+        <div style="display: flex; gap: 0.5vw">
+            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Filter by Start Time" title="Type in a name">
+            <select id="search-filter" class="form-control btn btn-secondary" th:required="required">
+                <option value="0">[[#{reservation.start.time}]]</option>
+                <option value="1">[[#{reservation.end.time}]]</option>
+                <option value="2">[[#{reservation.subject}]]</option>
+                <option value="3">[[#{reservation.room.name}]]</option>
+                <option value="4">[[#{reservation.creator}]]</option>
+                <option value="6">[[#{reservation.notes}]]</option>
+                <option value="7">[[#{reservation.status}]]</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+
+        <table id="Table" class = "table table-responsive table-bordered">
+            <thead>
+            <tr align="center">
+                <th class="content-th order" onclick="sortTableByDate(0)">[[#{reservation.start.time}]]</th>
+                <th class="content-th order" onclick="sortTableByDate(1)">[[#{reservation.end.time}]]</th>
+                <th class="content-th order" onclick="sortTable(2)">[[#{reservation.subject}]]</th>
+                <th class="content-th order" onclick="sortTable(3)">[[#{reservation.room.name}]]</th>
+                <th class="content-th order" onclick="sortTable(4)">[[#{reservation.creator}]]</th>
+                <th class="content-th order" onclick="sortTable(5)">[[#{reservation.urgency}]]</th>
+                <th class="content-th">[[#{reservation.notes}]]</th>
+                <th class="content-th order" onclick="sortTable(7)">[[#{reservation.status}]]</th>
+                <div sec:authorize="hasAnyAuthority('CREATE', 'UPDATE', 'DELETE', 'MANAGE')">
+                    <th class="content-th">[[#{reservation.actions}]]</th>
+                </div>
+            </tr>
+            </thead>
+            <tbody>
+            <div th:each="reservation : ${reservations}" th:switch="${reservation.status}">
+                <tr th:case="P" class="table-warning">
+                    <td th:text="${#dates.format(reservation.start, 'dd-MM-yyyy HH:mm')}" align="center"></td>
+                    <td th:text="${#dates.format(reservation.end, 'dd-MM-yyyy HH:mm')}" align="center"></td>
+                    <td th:text="${reservation.name}" align="center"></td>
+                    <td th:text="${reservation.roomName}" align="center"></td>
+                    <td th:text="${reservation.creator}" align="center"></td>
+                    <div th:switch="${reservation.urgency}">
+                        <td th:case="true" align="center">
+                            [[#{reservation.yes}]]
+                        </td>
+                        <td th:case="false" align="center">
+                            [[#{reservation.no}]]
+                        </td>
+                    </div>
+                    <td th:text="${reservation.notes}"  style="font-size: 0.8rem; padding: 0.2rem 0.2rem; max-width: 15rem; overflow-x: auto; min-width: 5vw"></td>
+                    <td style="color: #c7c700" align="center">
+                        [[#{reservation.pending}]]</td>
+                    <td align="center" style="display: flex; justify-content: space-around">
+<!--                        <form th:action="@{/reservation/approve/{reservation_id} (reservation_id=${reservation.reservation_id})}" method="POST">-->
+<!--                            <button type="submit" class = "btn btn-primary btn-xs purple editView">-->
+<!--                                Approve-->
+<!--                            </button>-->
+<!--                        </form>-->
+                        <div sec:authorize="hasAnyAuthority('CREATE', 'DELETE', 'MANAGE')">
+                            <button class = "btn btn-primary btn-xs purple editView" th:attr="onclick='approveReservation(' + ${reservation.reservation_id} + ')'" >
+                                [[#{reservation.approve}]]
+                            </button>
+    <!--                        <form th:action="@{/reservation/decline/{reservation_id} (reservation_id=${reservation.reservation_id})}" method="POST">-->
+    <!--                            <button type="submit" class = "btn btn-danger btn-xs purple editView">-->
+    <!--                                Decline-->
+    <!--                            </button>-->
+    <!--                        </form>-->
+                            <button class = "btn btn-danger btn-xs purple editView" th:attr="onclick='declineReservation(' + ${reservation.reservation_id} + ')'" >
+                                [[#{reservation.decline}]]
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" th:attr="data-bs-target='#Details' + ${reservation.reservation_id}">
+                            [[#{reservation.details}]]
+                        </button>
+                    </td>
+                </tr>
+
+
+                <tr th:case="C" class="table-danger">
+                    <td th:text="${#dates.format(reservation.start, 'dd-MM-yyyy HH:mm')}" align="center"></td>
+                    <td th:text="${#dates.format(reservation.end, 'dd-MM-yyyy HH:mm')}" align="center"></td>
+                    <td th:text="${reservation.name}" align="center"></td>
+                    <td th:text="${reservation.roomName}" align="center"></td>
+                    <td th:text="${reservation.creator}" align="center"></td>
+                    <div th:switch="${reservation.urgency}">
+                        <td th:case="true" align="center">
+                            [[#{reservation.yes}]]
+                        </td>
+                        <td th:case="false" align="center">
+                            [[#{reservation.no}]]
+                        </td>
+                    </div>
+                    <td th:text="${reservation.notes}"  style="font-size: 0.8rem; padding: 0.2rem 0.2rem; max-width: 15rem; overflow-x: auto; min-width: 5vw"></td>
+                    <td style="color: #c7c700" align="center">
+                        [[#{reservation.pending}]]</td>
+                    <td align="center" style="display: flex; justify-content: space-around">
+<!--                        <form th:action="@{/reservation/approve/{reservation_id} (reservation_id=${reservation.reservation_id})}" method="POST">-->
+<!--                            <button type="submit" class = "btn btn-primary btn-xs purple editView">-->
+<!--                                Approve-->
+<!--                            </button>-->
+<!--                        </form>-->
+                        <div sec:authorize="hasAnyAuthority('CREATE', 'DELETE', 'MANAGE')">
+                            <button class = "btn btn-primary btn-xs purple editView" th:attr="onclick='approveReservation(' + ${reservation.reservation_id} + ')'" >
+                                [[#{reservation.approve}]]
+                            </button>
+    <!--                        <form th:action="@{/reservation/decline/{reservation_id} (reservation_id=${reservation.reservation_id})}" method="POST">-->
+    <!--                            <button type="submit" class = "btn btn-danger btn-xs purple editView">-->
+    <!--                                Decline-->
+    <!--                            </button>-->
+    <!--                        </form>-->
+                            <button class = "btn btn-danger btn-xs purple editView" th:attr="onclick='declineReservation(' + ${reservation.reservation_id} + ')'" >
+                                [[#{reservation.decline}]]
+                            </button>
+                        </div>
+<!--                        <form th:action="@{/reservation/conflicts/{reservation_id} (reservation_id=${reservation.reservation_id})}" method="POST">-->
+<!--                            <button type="submit" class = "btn btn-warning btn-xs purple editView">-->
+<!--                                Conflicts-->
+<!--                            </button>-->
+<!--                        </form>-->
+<!--                        <button class = "btn btn-warning btn-xs purple editView" th:attr="onclick='$.post(\'/reservation/conflicts/' + ${reservation.reservation_id} + '\', function( data ) {$( \'#ConflictsModal\' ).append(data); $(\'#ConflictsModal\').load(location.href+\' #ConflictsModal>*\',\'\');}); $( \'#ConflictsButton\').click();'" >-->
+<!--                            Conflicts-->
+<!--                        </button>-->
+                        <button class = "btn btn-warning btn-xs purple editView" th:attr="onclick='conflictingReservations(' + ${reservation.reservation_id} + ')'" >
+                            [[#{reservation.conflicts}]]
+                        </button>
+
+
+<!--                        <button class = "btn btn-warning btn-xs purple editView" onclick="$.ajax({type: 'POST', url: '/reservation/conflicts/71'})" >-->
+<!--                            Conflicts-->
+<!--                        </button>-->
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" th:attr="data-bs-target='#Details' + ${reservation.reservation_id}">
+                            [[#{reservation.details}]]
+                        </button>
+                    </td>
+                </tr>
+
+                <div class="modal fade" th:id="Details + ${reservation.reservation_id}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-l">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div></div>
+                                <h2 class="modal-title" id="exampleModalLabel">[[#{reservation.details}]]</h2>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin: 0"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.category}]]:</h4>
+                                    <p th:text="${reservation.name}" style="font-size: 1vw;"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.start.time}]]:</h4>
+                                    <p th:text="${reservation.start}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.end.time}]]:</h4>
+                                    <p th:text="${reservation.end}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.room.name}]]:</h4>
+                                    <p th:text="${reservation.roomName}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.creator}]]:</h4>
+                                    <p th:text="${reservation.creator}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.status}]]:</h4>
+                                    <div th:switch="${reservation.status}">
+                                        <p th:case="A" style="font-size: 1vw">[[#{reservation.approved}]]</p>
+                                        <p th:case="P" style="font-size: 1vw">[[#{reservation.pending}]]</p>
+                                        <p th:case="C" style="font-size: 1vw">[[#{reservation.pending}]]</p>
+                                        <p th:case="D" style="font-size: 1vw">[[#{reservation.declined}]]</p>
+                                        <p th:case="R" style="font-size: 1vw">[[#{reservation.revoked}]]</p>
+                                        <p th:case="F" style="font-size: 1vw">[[#{reservation.finished}]]</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.urgency}]]:</h4>
+                                    <div th:switch="${reservation.urgency}">
+                                        <p th:case="true">[[#{reservation.yes}]]</p>
+                                        <p th:case="false">[[#{reservation.no}]]</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.cleaning}]]:</h4>
+                                    <div th:switch="${reservation.cleaningService}">
+                                        <p th:case="true">[[#{reservation.yes}]]</p>
+                                        <p th:case="false">[[#{reservation.no}]]</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.food}]]:</h4>
+                                    <div th:switch="${reservation.foodService}">
+                                        <p th:case="true">[[#{reservation.yes}]]</p>
+                                        <p th:case="false">[[#{reservation.no}]]</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.notes}]]:</h4>
+                                    <p th:text="${reservation.notes}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 5vw; justify-content: center">
+                                    <div>
+                                        <h4 style="margin-left: 0.5vw">[[#{reservation.participants}]]:</h4>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item" th:each="userName : ${reservation.userNames}" th:text="${userName}" ></li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 style="margin-left: 0.5vw">[[#{reservation.equipments}]]:</h4>
+                                        <ul class="list-group list-group-flush" >
+                                            <li class="list-group-item" th:each="equipmentName : ${reservation.equipmentNames}" th:switch="${equipmentName}" th:case="${equipmentName}" th:text="${equipmentName}" ></li>
+                                            <!--                                            <li class="list-group-item" th:case="null"></li>-->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+<!--                            <div class="modal-footer">-->
+<!--                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
+<!--                            </div>-->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" th:id="innerDetails + ${reservation.reservation_id}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-l">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div></div>
+                                <h2 class="modal-title" id="exampleModalLabel3">[[#{reservation.details}]]</h2>
+                                <button type="button" class="btn" data-bs-toggle="modal" th:attr="data-bs-target='#Conflicts'" aria-label="Close">🢀</button>
+                            </div>
+                            <div class="modal-body">
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.category}]]:</h4>
+                                    <p th:text="${reservation.name}" style="font-size: 1vw;"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.start.time}]]:</h4>
+                                    <p th:text="${reservation.start}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.end.time}]]:</h4>
+                                    <p th:text="${reservation.end}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.room.name}]]:</h4>
+                                    <p th:text="${reservation.roomName}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.creator}]]:</h4>
+                                    <p th:text="${reservation.creator}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.status}]]:</h4>
+                                    <div th:switch="${reservation.status}">
+                                        <p th:case="A" style="font-size: 1vw">[[#{reservation.approved}]]</p>
+                                        <p th:case="P" style="font-size: 1vw">[[#{reservation.pending}]]</p>
+                                        <p th:case="C" style="font-size: 1vw">[[#{reservation.pending}]]</p>
+                                        <p th:case="D" style="font-size: 1vw">[[#{reservation.declined}]]</p>
+                                        <p th:case="R" style="font-size: 1vw">[[#{reservation.revoked}]]</p>
+                                        <p th:case="F" style="font-size: 1vw">[[#{reservation.finished}]]</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>Urgency:</h4>
+                                    <div th:switch="${reservation.urgency}">
+                                        <p th:case="true">[[#{reservation.yes}]]</p>
+                                        <p th:case="false">[[#{reservation.no}]]</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.cleaning}]]:</h4>
+                                    <div th:switch="${reservation.cleaningService}">
+                                        <p th:case="true">[[#{reservation.yes}]]</p>
+                                        <p th:case="false">[[#{reservation.no}]]</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.food}]]:</h4>
+                                    <div th:switch="${reservation.foodService}">
+                                        <p th:case="true">[[#{reservation.yes}]]</p>
+                                        <p th:case="false">[[#{reservation.no}]]</p>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5vw; justify-content: center">
+                                    <h4>[[#{reservation.notes}]]:</h4>
+                                    <p th:text="${reservation.notes}" style="font-size: 1vw"></p>
+                                </div>
+
+                                <div style="display: flex; gap: 5vw; justify-content: center">
+                                    <div>
+                                        <h4 style="margin-left: 0.5vw">[[#{reservation.participants}]]:</h4>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item" th:each="userName : ${reservation.userNames}" th:text="${userName}" ></li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 style="margin-left: 0.5vw">[[#{reservation.equipments}]]:</h4>
+                                        <ul class="list-group list-group-flush" >
+                                            <li class="list-group-item" th:each="equipmentName : ${reservation.equipmentNames}" th:switch="${equipmentName}" th:case="${equipmentName}" th:text="${equipmentName}" ></li>
+                                            <!--                                            <li class="list-group-item" th:case="null"></li>-->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--                            <div class="modal-footer">-->
+                            <!--                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
+                            <!--                            </div>-->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            </tbody>
+        </table>
+        </div>
+
+
+
+    <div id="ConflictsModal" >
+        <button hidden id="ConflictsButton" type="button" class="btn btn-info" data-bs-toggle="modal" th:attr="data-bs-target='#Conflicts'">
+        </button>
+        <div class="modal fade" th:id="Conflicts" tabindex="-1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel2">[[#{reservation.conflicts}]]</h5>
+                        <button id="ConflictsModalClose" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+
+                        <table id="Table2" class = "table table-responsive table-bordered" style="font-size: 0.7vw">
+                            <thead>
+                            <tr align="center">
+                                <th class="content-th ">[[#{reservation.start.time}]]</th>
+                                <th class="content-th ">[[#{reservation.end.time}]]</th>
+                                <th class="content-th ">[[#{reservation.subject}]]</th>
+                                <th class="content-th ">[[#{reservation.room.name}]]</th>
+                                <th class="content-th ">[[#{reservation.creator}]]</th>
+                                <th class="content-th ">[[#{reservation.urgency}]]</th>
+                                <th class="content-th">[[#{reservation.notes}]]</th>
+                                <th class="content-th ">[[#{reservation.status}]]</th>
+                                <div sec:authorize="hasAnyAuthority('CREATE', 'UPDATE', 'DELETE', 'MANAGE')">
+                                    <th class="content-th">[[#{reservation.actions}]]</th>
+                                </div>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <div th:each="conflictingReservation : ${ConflictingReservations}" th:switch="${conflictingReservation.status}">
+                                <tr th:case="A" class="table-success">
+                                    <td th:text="${#dates.format(conflictingReservation.start, 'dd-MM-yyyy HH:mm')}" align="center"></td>
+                                    <td th:text="${#dates.format(conflictingReservation.end, 'dd-MM-yyyy HH:mm')}" align="center"></td>
+                                    <td th:text="${conflictingReservation.name}" align="center"></td>
+                                    <td th:text="${conflictingReservation.roomName}" align="center"></td>
+                                    <td th:text="${conflictingReservation.creator}" align="center"></td>
+                                    <div th:switch="${conflictingReservation.urgency}">
+                                        <td th:case="true" align="center">[[#{reservation.yes}]]</td>
+                                        <td th:case="false" align="center">[[#{reservation.yes}]]</td>
+                                    </div>
+                                    <td th:text="${conflictingReservation.notes}"  style="font-size: 0.8rem; padding: 0.2rem 0.2rem; max-width: 15rem; overflow-x: auto; min-width: 5vw"></td>
+                                    <td style="color: #00bd00" align="center">[[#{reservation.approved}]]</td>
+                                    <td align="center" style="display: flex; justify-content: space-around">
+<!--                                        <form th:action="@{/reservation/decline/{reservation_id} (reservation_id=${conflictingReservation.reservation_id})}" method="POST">-->
+<!--                                            <button type="submit" class = "btn btn-danger btn-xs purple editView">-->
+<!--                                                Decline-->
+<!--                                            </button>-->
+<!--                                        </form>-->
+                                        <div sec:authorize="hasAnyAuthority('CREATE', 'DELETE', 'MANAGE')">
+                                            <button class = "btn btn-danger btn-xs purple editView" th:attr="onclick='declineReservation(' + ${conflictingReservation.reservation_id} + ')'" >
+                                                [[#{reservation.decline}]]
+                                            </button>
+                                        </div>
+                                        <button type="button" class="btn btn-info" data-bs-toggle="modal" th:attr="data-bs-target='#innerDetails' + ${conflictingReservation.reservation_id}">
+                                            [[#{reservation.details}]]
+                                        </button>
+                                    </td>
+                                </tr>
+
+
+                                <tr th:case="C" class="table-danger">
+                                    <td th:text="${#dates.format(conflictingReservation.start, 'dd-MM-yyyy HH:mm')}" align="center"></td>
+                                    <td th:text="${#dates.format(conflictingReservation.end, 'dd-MM-yyyy HH:mm')}" align="center"></td>
+                                    <td th:text="${conflictingReservation.name}" align="center"></td>
+                                    <td th:text="${conflictingReservation.roomName}" align="center"></td>
+                                    <td th:text="${conflictingReservation.creator}" align="center"></td>
+                                    <div th:switch="${conflictingReservation.urgency}">
+                                        <td th:case="true" align="center">[[#{reservation.yes}]]</td>
+                                        <td th:case="false" align="center">[[#{reservation.no}]]</td>
+                                    </div>
+                                    <td th:text="${conflictingReservation.notes}"  style="font-size: 0.8rem; padding: 0.2rem 0.2rem; max-width: 15rem; overflow-x: auto; min-width: 5vw"></td>
+                                    <td style="color: #c7c700" align="center">[[#{reservation.pending}]]</td>
+                                    <td align="center" style="display: flex; justify-content: space-around">
+<!--                                        <form th:action="@{/reservation/approve/{reservation_id} (reservation_id=${conflictingReservation.reservation_id})}" method="POST">-->
+<!--                                            <button type="submit" class = "btn btn-primary btn-xs purple editView">-->
+<!--                                                Approve-->
+<!--                                            </button>-->
+<!--                                        </form>-->
+                                        <div sec:authorize="hasAnyAuthority('CREATE', 'DELETE', 'MANAGE')">
+                                            <button class = "btn btn-primary btn-xs purple editView" th:attr="onclick='approveReservation(' + ${conflictingReservation.reservation_id} + ')'" >
+                                                [[#{reservation.approve}]]
+                                            </button>
+    <!--                                        <form th:action="@{/reservation/decline/{reservation_id} (reservation_id=${conflictingReservation.reservation_id})}" method="POST">-->
+    <!--                                            <button type="submit" class = "btn btn-danger btn-xs purple editView">-->
+    <!--                                                Decline-->
+    <!--                                            </button>-->
+    <!--                                        </form>-->
+                                            <button class = "btn btn-danger btn-xs purple editView" th:attr="onclick='declineReservation(' + ${conflictingReservation.reservation_id} + ')'" >
+                                                [[#{reservation.decline}]]
+                                            </button>
+                                        </div>
+<!--                                        <form th:action="@{/reservation/conflicts/{reservation_id} (reservation_id=${conflictingReservation.reservation_id})}" method="POST">-->
+<!--                                            <button type="submit" class = "btn btn-warning btn-xs purple editView">-->
+<!--                                                Conflicts-->
+<!--                                            </button>-->
+<!--                                        </form>-->
+                                        <button class = "btn btn-warning btn-xs purple editView" th:attr="onclick='innerconflictingReservations(' + ${conflictingReservation.reservation_id} + ')'" >
+                                            [[#{reservation.conflicts}]]
+                                        </button>
+
+                                        <button type="button" class="btn btn-info" data-bs-toggle="modal" th:attr="data-bs-target='#innerDetails' + ${conflictingReservation.reservation_id}">
+                                            [[#{reservation.details}]]
+                                        </button>
+                                    </td>
+                                </tr>
+                            </div>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+
+    <div layout:fragment="script">
+        <script src="/js/sort_search_table_reservations.js"></script>
+        <script src="/js/calendar_room_conflicts.js"></script>
+    </div>
+
+</div>
+</body>
+</html>

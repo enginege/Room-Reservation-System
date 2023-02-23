@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="_layout"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <div layout:fragment="header">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.2/main.min.css"
+    />
+    <link href="/css/calendar.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+      crossorigin="anonymous"
+    />
+    <link href="/css/sidebars.css" rel="stylesheet" />
+  </div>
+
+  <body>
+    <div layout:fragment="content">
+      <!--Content of the page-->
+
+      <h1 class="page-header">[[#{users.title}]]</h1>
+
+      <div class="">
+        <div
+          class="alert alert-success"
+          align="center"
+          role="alert"
+          th:text="${success}"
+          th:if="${success}"
+        ></div>
+
+        <div style="display: flex; justify-content: space-between">
+          <div>
+            <a th:href="@{/user/new}" sec:authorize="hasAuthority('CREATE')">
+              <button type="button" class="btn btn-primary pull-right">
+                <i class="fa fa-plus"></i>[[#{users.newU}]]
+              </button>
+            </a>
+          </div>
+          <div style="display: flex; gap: 0.5vw">
+            <input
+              type="text"
+              id="searchInput"
+              onkeyup="searchTable()"
+              placeholder="Filter by Name"
+              title="Type in a name"
+            />
+            <select
+              id="search-filter"
+              class="form-control btn btn-secondary"
+              th:required="required"
+            >
+              <option value="0">[[#{users.name}]]</option>
+              <option value="1">[[#{users.surname}]]</option>
+              <option value="2">[[#{users.username}]]</option>
+              <option value="3">E-mail</option>
+              <option value="4">[[#{users.department}]]</option>
+            </select>
+          </div>
+        </div>
+
+        <!--form th:action="@{/user/list" method="get">
+                    <input type="search" th:value="${param.search}" name='search' placeholder="search">
+                    <button type="submit">Search</button>
+                </form-->
+        <div class="table-wrapper">
+          <table
+            id="Table"
+            class="table table-responsive table-bordered table-striped"
+          >
+            <thead>
+              <tr align="center">
+                <th
+                  class="content-th order"
+                  onclick="sortTable(0)"
+                  style="width: fit-content"
+                >
+                  [[#{users.name}]]
+                </th>
+                <th
+                  class="content-th order"
+                  onclick="sortTable(1)"
+                  style="width: fit-content"
+                >
+                  [[#{users.surname}]]
+                </th>
+                <th
+                  class="content-th order"
+                  onclick="sortTable(2)"
+                  style="width: fit-content"
+                >
+                  [[#{users.username}]]
+                </th>
+                <th
+                  class="content-th order"
+                  onclick="sortTable(3)"
+                  style="width: fit-content"
+                >
+                  E-mail
+                </th>
+                <th
+                  class="content-th order"
+                  onclick="sortTable(4)"
+                  style="width: max-content"
+                >
+                  [[#{users.department}]]
+                </th>
+                <div
+                  sec:authorize="hasAnyAuthority('CREATE', 'UPDATE', 'DELETE')"
+                >
+                  <th class="content-th" style="width: 9vw">
+                    [[#{users.actions}]]
+                  </th>
+                </div>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="user : ${users}" align="center">
+                <td th:text="${user.firstName}"></td>
+                <td th:text="${user.lastName}"></td>
+                <td th:text="${user.userName}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.departmentName}"></td>
+                <div sec:authorize="hasAnyAuthority('CREATE', 'DELETE')">
+                  <td style="display: flex; justify-content: space-around">
+                    <a
+                      href="#"
+                      class="btn btn-primary btn-xs purple editView"
+                      title="Edit"
+                      th:href="@{'/user/edit/' + ${user.userName}}"
+                      ><i class="fa fa-edit"></i>[[#{users.edit}]]</a
+                    >
+                    <div sec:authorize="hasAuthority('DELETE')">
+                      <form
+                        th:action="@{/user/delete/{username} (username=${user.userName})}"
+                        method="POST"
+                      >
+                        <button
+                          type="submit"
+                          class="btn btn-danger btn-xs purple deleteView"
+                        >
+                          [[#{users.delete}]]
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </div>
+                <div sec:authorize="hasAnyAuthority('UPDATE')">
+                  <td style="display: flex; justify-content: space-around">
+                    <a
+                      href="#"
+                      class="btn btn-primary btn-xs purple editView"
+                      title="Edit"
+                      th:href="@{'/user/edit/' + ${user.userName}}"
+                      ><i class="fa fa-edit"></i>[[#{users.display}]]</a
+                    >
+                  </td>
+                </div>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div layout:fragment="script">
+      <!--            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>-->
+      <!--            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
+      <script src="/js/sort_search_table.js"></script>
+    </div>
+  </body>
+</html>
