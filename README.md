@@ -3,6 +3,16 @@ The Room Reservation System I developed during my 2-month internship at Yaşar B
 
 Live Demo Link: https://room-reservation-system.up.railway.app
 
+Credentials of Demo Roles:
+
+1.Employee: email: employee@employee.com password: 123
+
+2.Reservation Officer: email: rofficer@admin.com password: 123
+
+3.Control Admin: email: admin@admin.com password: 123
+
+4.Super admin has too much effect on the database; therefore, no access :)
+
 
 UML Class Diagram of Room Reservation Software:
 
